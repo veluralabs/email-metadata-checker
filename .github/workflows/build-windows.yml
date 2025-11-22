@@ -1,0 +1,48 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install dnspython python-whois requests
+        pip install pyinstaller
+
+    - name: Build executable with PyInstaller
+      run: |
+        pyinstaller --onefile --name EmailMetadataChecker --console email_metadata_checker.py
+
+    - name: Test executable
+      run: |
+        if (Test-Path dist/EmailMetadataChecker.exe) {
+          Write-Host "Executable built successfully"
+        } else {
+          Write-Host "Build failed"
+          exit 1
+        }
+      shell: powershell
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: EmailMetadataChecker-Windows
+        path: dist/EmailMetadataChecker.exe
+        retention-days: 90
