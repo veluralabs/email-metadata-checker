@@ -1162,15 +1162,22 @@ def main():
     checker = EmailDomainChecker(email, sender_ip=sender_ip, email_body=email_body)
     checker.analyze()
 
+    # Keep window open on Windows
+    print("\n" + "="*80)
+    input("Press Enter to exit...")
+
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         print("\n\n[!] Interrupted by user")
+        input("\nPress Enter to exit...")
         sys.exit(0)
     except Exception as e:
         print(f"\n[!] Error: {str(e)}")
         import traceback
         traceback.print_exc()
+        print("\n" + "="*80)
+        input("Press Enter to exit...")
         sys.exit(1)
