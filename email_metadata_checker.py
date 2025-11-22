@@ -309,33 +309,33 @@ class EmailDomainChecker:
                 mx_list.append(f'Priority {record.preference}: {str(record.exchange)}')
 
             if mx_list:
-                self.results['mx']['status'] = 'CONFIGURED'
-                self.results['mx']['weight'] = 10
-                self.results['mx']['details'] = f'Mail servers found:\n  ' + '\n  '.join(mx_list)
+                self.mx_results['status'] = 'CONFIGURED'
+                self.mx_results['score'] = 100
+                self.mx_results['details'] = f'Mail servers found:\n  ' + '\n  '.join(mx_list)
 
                 # Identify provider
                 mx_str = ' '.join(mx_list).lower()
                 if 'google' in mx_str or 'googlemail' in mx_str:
-                    self.results['mx']['details'] += '\n  Provider: Google Workspace / Gmail'
+                    self.mx_results['details'] += '\n  Provider: Google Workspace / Gmail'
                 elif 'outlook' in mx_str or 'microsoft' in mx_str:
-                    self.results['mx']['details'] += '\n  Provider: Microsoft 365 / Outlook'
+                    self.mx_results['details'] += '\n  Provider: Microsoft 365 / Outlook'
                 elif 'mimecast' in mx_str:
-                    self.results['mx']['details'] += '\n  Provider: Mimecast (Email Security)'
+                    self.mx_results['details'] += '\n  Provider: Mimecast (Email Security)'
                 elif 'proofpoint' in mx_str:
-                    self.results['mx']['details'] += '\n  Provider: Proofpoint (Email Security)'
+                    self.mx_results['details'] += '\n  Provider: Proofpoint (Email Security)'
             else:
-                self.results['mx']['status'] = 'NOT CONFIGURED'
-                self.results['mx']['weight'] = -30
-                self.results['mx']['details'] = 'No MX records - cannot receive email'
+                self.mx_results['status'] = 'NOT CONFIGURED'
+                self.mx_results['score'] = 0
+                self.mx_results['details'] = 'No MX records - cannot receive email'
 
         except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-            self.results['mx']['status'] = 'NOT CONFIGURED'
-            self.results['mx']['weight'] = -30
-            self.results['mx']['details'] = 'No MX records found'
+            self.mx_results['status'] = 'NOT CONFIGURED'
+            self.mx_results['score'] = 0
+            self.mx_results['details'] = 'No MX records found'
         except Exception as e:
-            self.results['mx']['status'] = 'ERROR'
-            self.results['mx']['weight'] = 0
-            self.results['mx']['details'] = f'Error: {str(e)}'
+            self.mx_results['status'] = 'ERROR'
+            self.mx_results['score'] = 50
+            self.mx_results['details'] = f'Error: {str(e)}'
 
     def check_tls_support(self):
         """Check if mail server supports TLS/SSL with cipher details"""
